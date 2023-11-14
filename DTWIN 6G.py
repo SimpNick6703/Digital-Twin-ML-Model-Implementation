@@ -52,7 +52,7 @@ def transfer_learning_digital_twin_migration(source_model, target_model, layers_
     return results
 
 def select_initial_state():
-    return random.choice(nodes)
+    return nodes.index(random.choice(nodes))
 
 def select_action_epsilon_greedy(q_values, state, actions, exploration_rate):
     # Ensure that the state index is within the valid range
