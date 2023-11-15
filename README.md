@@ -1,2 +1,2 @@
 # Digital-Twin-ML-Model-Implementation
-Implementing Digital Twin over AI/ML for 6G Network
+test.ipynb has 3 randomly generated datasets that do not have any relation with real world and only for randomization.
