@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
 
 def distance(node1, node2):
@@ -40,7 +41,6 @@ def adaptive_edge_association(graph, nodes, edges, threshold, learning_rate):
 
 def transfer_learning_digital_twin_migration(source_model, target_model, layers_to_transfer, learning_rate):
     results = {}
-    
     for layer_name in layers_to_transfer:
         if layer_name in source_model and layer_name in target_model:
             # Transfer weights from source_model to target_model for the specified layer
@@ -55,17 +55,11 @@ def select_initial_state():
     return nodes.index(random.choice(nodes))
 
 def select_action_epsilon_greedy(q_values, state, actions, exploration_rate):
-    # Ensure that the state index is within the valid range
     state = min(max(state, 0), len(q_values) - 1)
-
     if np.random.rand() < exploration_rate:
-        # Explore: Choose a random action
         return np.random.choice(actions)
     else:
-        # Exploit: Choose the action with the highest Q-value for the current state
         action_index = np.argmax(q_values[state])
-
-        # Ensure that the action index is within the valid range
         action_index = min(max(action_index, 0), len(actions) - 1)
         return actions[action_index]
     
@@ -74,7 +68,6 @@ def transition(current_state, selected_action):
 
 def get_reward(current_state, selected_action):
     action_value_map = {'action1': 1, 'action2': 2}
-    
     if selected_action in action_value_map:
         return current_state + action_value_map[selected_action]
     else:
@@ -86,62 +79,38 @@ def deep_reinforcement_learning_digital_twin_placement(graph, nodes, edges, acti
     for episode in range(max_episodes):
         state = select_initial_state()
         for time_step in range(max_time_steps):
-            # Select action using an epsilon-greedy policy
             action = select_action_epsilon_greedy(q_values, state, actions, exploration_rate)
-
-            # Transition to the next state based on the selected action
             next_state = transition(state, action)
-
-            # Receive reward based on the transition
             reward = get_reward(state, action)
-
-            # Ensure that action is always an integer before using it as an index
             try:
                 action = int(action)
             except ValueError:
                 print(f"Invalid action: {action}. Skipping this time step.")
                 continue
-
-            # Convert state and action to integers before using them as indices
             state = int(state)
-
-            # Ensure that next_state is within the valid range of indices
             next_state = min(max(next_state, 0), len(q_values) - 1)
-
-            # Update Q-values based on the Bellman equation
             q_values[state][action] = q_values[state][action] + learning_rate * (reward + discount_factor * np.max(q_values[next_state]) - q_values[state][action])
-
             state = next_state
     final_q_values = q_values
     return final_q_values
 
 def kmeans_edge_association(graph, nodes, edges, k):
-    results = {i: [] for i in range(k)}  # Initialize results with empty lists for each cluster
-    
-    # Reshape the nodes to a 2D array
-    nodes_2d = np.array(nodes).reshape(-1, 1)
-
-    # Apply k-means clustering on the nodes
-    kmeans = KMeans(n_clusters=k).fit(nodes_2d)
-    node_clusters = kmeans.labels_
-
-    # Print clustering results for debugging
-    print("Node Clusters:", node_clusters)
-
-    # Associate edges to nodes in each cluster
+    results = {i: [] for i in range(k)}
+    kmeans = KMeans(n_clusters=k).fit(nodes)
+    node_clusters = kmeans.labels_ 
     for node, cluster in zip(nodes, node_clusters):
-        print("Node:", node, "Cluster:", cluster)
         if cluster in results:
+            results[cluster].append(node)
             if node in graph:
                 results[cluster].extend(graph[node])
             else:
                 print(f"Warning: Node {node} not found in the graph.")
         else:
-            results[cluster] = [graph[node]]
-    return results
+            results[cluster] = [node]
+    return results, node_clusters
 
 def initialize_q_values(threshold, actions):
-    num_states = 1  # Assuming threshold is a single value
+    num_states = 1
     num_actions = len(actions)
     q_values = np.zeros((num_states, num_actions))
     return q_values
@@ -157,27 +126,16 @@ def calculate_reward(edges, rewards):
 
 def reinforcement_learning_edge_association(graph, nodes, edges, threshold, learning_rate, exploration_rate, discount_factor, max_episodes):
     results = {}
-    # Initialize Q-values for each state-action pair
     q_values = initialize_q_values([threshold], actions)
-
     for episode in range(max_episodes):
         state = threshold
         for time_step in range(max_time_steps):
-            # Select action using an epsilon-greedy policy
             action = select_action_epsilon_greedy(q_values, state, actions, exploration_rate)
-
-            # Update threshold and associated edges based on the selected action
             update_threshold_edges(nodes, edges, action)
-
-            # Receive reward based on the quality of associations
             reward = calculate_reward(edges, rewards)
-
-            # Update Q-value for the current state-action pair
             next_state = action
             q_values[state][action] = q_values[state][action] + learning_rate * (reward + discount_factor * np.max(q_values[next_state]) - q_values[state][action])
-
             state = next_state
-
     results = q_values
     return results
 
@@ -214,6 +172,13 @@ adaptive_results = adaptive_edge_association(graph, nodes, edges, threshold, lea
 for edge, associated_nodes in adaptive_results.items():
     print(f"Associated nodes for edge {edge}: {associated_nodes}")
     
+# Call the kmeans_edge_association function
+association_results, node_clusters = kmeans_edge_association(graph, nodes, edges, k)
+for cluster, associated_nodes in association_results.items():
+    print(f"Associated nodes for cluster {cluster}: {associated_nodes}")
+for node, cluster in zip(nodes, node_clusters):
+    print(f"Node {node} belongs to cluster {cluster}")
+
 # Call the transfer_learning_digital_twin_migration function
 transfer_results = transfer_learning_digital_twin_migration(source_model, target_model, layers_to_transfer, learning_rate)
 for layer_name, updated_weights in transfer_results.items():
@@ -223,11 +188,6 @@ for layer_name, updated_weights in transfer_results.items():
 final_q_values = deep_reinforcement_learning_digital_twin_placement(graph, nodes, edges, actions, rewards, q_values, learning_rate, discount_factor, exploration_rate, max_episodes, max_time_steps)
 print("Final Q-values:")
 print(final_q_values)
-
-# Call the kmeans_edge_association function
-association_results = kmeans_edge_association(graph, nodes, edges, k)
-for node, associated_edges in association_results.items():
-    print(f"Associated edges for node {node}: {associated_edges}")
     
 # Call the reinforcement_learning_edge_association function
 q_values = reinforcement_learning_edge_association(graph, nodes, edges, threshold, learning_rate, exploration_rate, discount_factor, max_episodes)
