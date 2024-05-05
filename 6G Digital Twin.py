@@ -17,9 +17,7 @@ def edge_association(graph, nodes, edges, threshold):
     for edge in edges:
         associated_nodes = []
         for node in nodes:
-            # Perform edge association based on the given threshold
             if distance(node, edge) <= threshold:
-                # Add node to edge's list of associated nodes
                 associated_nodes.append(node)
         results[edge] = associated_nodes
     return results
@@ -29,13 +27,10 @@ def adaptive_edge_association(graph, nodes, edges, threshold, learning_rate):
     for edge in edges:
         associated_nodes = []
         for node in nodes:
-            # Perform edge association based on the threshold
             if distance(node, edge) <= threshold:
-                # Add node to edge's list of associated nodes
                 associated_nodes.append(node)
         results[edge] = associated_nodes
         if len(associated_nodes) == 0:
-            # Update the threshold based on the learning rate
             threshold += learning_rate
     return results
 
@@ -43,7 +38,6 @@ def transfer_learning_digital_twin_migration(source_model, target_model, layers_
     results = {}
     for layer_name in layers_to_transfer:
         if layer_name in source_model and layer_name in target_model:
-            # Transfer weights from source_model to target_model for the specified layer
             source_weights = source_model[layer_name]['weights']
             target_model[layer_name]['weights'] = source_weights
             results[layer_name] = target_model[layer_name]['weights']
