@@ -1,0 +1,66 @@
+/'Flow Diagram of the code'/
+@startuml
+start
+
+:Generate graph, nodes, edges, actions, rewards;
+:Define parameters like threshold, learning rate, discount factor, exploration rate, max episodes, max time steps, k;
+:Define initial Q-values;
+
+if (Edge Association) then (yes)
+  :Associate nodes to edges based on distance;
+  :Display associated nodes for each edge;
+  if (no) then (Stop)
+  else (yes)
+    :Display nodes associated with each cluster;
+  endif
+else (no)
+endif
+
+if (Adaptive Edge Association) then (yes)
+  :Adjust threshold based on learning rate if needed;
+  detach
+else (no)
+endif
+
+if (K-Means Edge Association) then (yes)
+  :Cluster nodes using K-Means algorithm;
+  :Display associated nodes for each cluster;
+  detach
+else (no)
+endif
+
+if (Transfer Learning) then (yes)
+  :Transfer weights from source model to target model;
+  :Display updated weights;
+  detach
+else (no)
+endif
+
+if (Deep Reinforcement Learning) then (yes)
+  :For each episode:;
+  :- Select initial state;
+  :For each time step:;
+  :- Select action using epsilon-greedy policy;
+  :Transition to next state;
+  :Get reward;
+  :Update Q-values;
+  :Display final Q-values;
+  detach
+else (no)
+endif
+
+if (Reinforcement Learning) then (yes)
+  :For each episode:;
+  :- Select initial state;
+  :For each time step:;
+  :- Select action using epsilon-greedy policy;
+  :Update threshold edges;
+  :Calculate reward;
+  :Update Q-values;
+  :Display final Q-values;
+  detach
+else (no)
+endif
+
+stop
+@enduml
